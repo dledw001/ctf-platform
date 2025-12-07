@@ -1,13 +1,12 @@
 const request = require('supertest');
 const app = require('../src/app');
-const { resetDb, closeDb } = require('./testDb');
+const { resetDb, closeDb } = require('./testUtils');
 
 beforeEach(async () => {
     await resetDb();
 });
 
 afterAll(async () => {
-    await resetDb();
     await closeDb();
 });
 
