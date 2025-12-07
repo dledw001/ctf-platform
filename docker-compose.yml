@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: ctf_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ctf_user
+      POSTGRES_PASSWORD: ctf_password
+      POSTGRES_DB: ctf_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+volumes:
+  pgdata:
