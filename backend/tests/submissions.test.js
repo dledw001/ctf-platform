@@ -96,4 +96,5 @@ describe('Admin Submissions API', () => {
         expect(res.body.length).toBe(1);
         expect(res.body[0].challengeId).toBe(challengeId);
     });
+
 })

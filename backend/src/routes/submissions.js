@@ -45,10 +45,10 @@ router.post('/', requireAuth, async (req, res, next) => {
        }
 
        const insert = await pool.query(
-           `INSERT INTO submissions (user_id, challenge_id, submitted_flag, is_correct) 
+           `INSERT INTO submissions (user_id, challenge_id, submitted_flag_hash, is_correct) 
             VALUES ($1, $2, $3, $4) 
             RETURNING id, user_id, challenge_id, is_correct, created_at`,
-           [req.userId, id, cleanFlag, isCorrect]
+           [userId, id, submittedHash, isCorrect]
        );
 
        const submission = insert.rows[0];
@@ -74,7 +74,6 @@ router.get('/', requireAuth, requireAdmin, async (req, res, next) => {
             `SELECT s.id, 
             s.created_at, 
             s.is_correct, 
-            s.submitted_flag, 
             u.email AS user_email, 
             c.id AS challenge_id, 
             c.title AS challenge_title,
@@ -90,7 +89,6 @@ router.get('/', requireAuth, requireAdmin, async (req, res, next) => {
            id: row.id,
            createdAt: row.created_at,
            isCorrect: row.is_correct,
-           submittedFlag: row.submitted_flag,
            userEmail: row.user_email,
            challengeId: row.challenge_id,
            challengeTitle: row.challenge_title,
