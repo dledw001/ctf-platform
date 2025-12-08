@@ -47,6 +47,7 @@ describe('Public Submissions API', () => {
                 challengeId,
                 flag: '{FLAG{test}}',
             });
+
         expect(res.status).toBe(401);
     });
 
@@ -58,26 +59,41 @@ describe('Public Submissions API', () => {
                 challengeId,
                 flag: '{FLAG{test}}',
             });
+
         expect(res.status).toBe(201);
     });
 
-    test('Admin reads submissions successfully', async () => {
-       const submission = await request(app)
-           .post('/api/submissions')
-           .set('Cookie', userCookie)
-           .send({
-              challengeId,
-              flag: '{FLAG{test}}',
-           });
-       expect(submission.status).toBe(201);
+    test('Submission fails for missing flag', async () => {
+        const res = await request(app)
+            .post('/api/submissions')
+            .set('Cookie', userCookie)
+            .send({
+                challengeId,
+            });
 
-       const res = await request(app)
-           .get('/api/submissions')
-           .set('Cookie', adminCookie)
-           .send();
-
-       expect(res.status).toBe(200);
-       expect(res.body[0].challengeId).toBe(challengeId);
+        expect(res.status).toBe(400);
     });
 
 });
+
+describe('Admin Submissions API', () => {
+    test('Admin reads submissions successfully', async () => {
+        const submission = await request(app)
+            .post('/api/submissions')
+            .set('Cookie', userCookie)
+            .send({
+                challengeId,
+                flag: '{FLAG{test}}',
+            });
+        expect(submission.status).toBe(201);
+
+        const res = await request(app)
+            .get('/api/submissions')
+            .set('Cookie', adminCookie)
+            .send();
+
+        expect(res.status).toBe(200);
+        expect(res.body.length).toBe(1);
+        expect(res.body[0].challengeId).toBe(challengeId);
+    });
+})
