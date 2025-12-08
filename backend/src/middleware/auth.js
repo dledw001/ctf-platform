@@ -11,10 +11,20 @@ function requireAuth(req, res, next) {
 
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+        const userId = payload.userId;
+
+        if (!userId) {
+            return res.status(401).json({error: 'Invalid token'});
+        }
+
         req.user = {
-            id: payload.userId,
-            isAdmin: payload.isAdmin,
-        };
+            id: userId,
+            isAdmin: !!payload.isAdmin,
+        }
+
+        req.userId = userId;
+
         next();
     } catch (err) {
         console.error('JWT verification failed', err);
