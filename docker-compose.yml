@@ -1,4 +1,35 @@
 services:
+  backend:
+    build: ./backend
+    container_name: ctf_backend
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://ctf_user:ctf_password@db:5432/ctf_db
+      JWT_SECRET: secret
+      FLAG_PEPPER: pepper
+    ports:
+      - "4000:4000"
+
+  backend_test:
+    build: ./backend
+    container_name: ctf_backend_test
+    depends_on:
+      - db_test
+    environment:
+      NODE_ENV: test
+      DATABASE_URL: postgres://ctf_user:ctf_password@db_test:5432/ctf_db_test
+      JWT_SECRET: test-secret
+      FLAG_PEPPER: test-pepper
+    command: sh -c "
+      echo 'Waiting for db_test...';
+      until nc -z db_test 5432; do
+      sleep 1;
+      done;
+      echo 'db_test is up, running migrations and tests...';
+      npm run migrate:test && npm test"
+
   db:
     image: postgres:16
     container_name: ctf_db
@@ -24,37 +55,6 @@ services:
       - "5433:5432"
     volumes:
       - pgdata_test:/var/lib/postgresql/data/
-
-  backend:
-    build: ./backend
-    container_name: ctf_backend
-    depends_on:
-      - db
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: postgres://ctf_user:ctf_password@db:5432/ctf_db
-      JWT_SECRET: secret
-      FLAG_PEPPER: pepper
-    ports:
-      - "4000:4000"
-
-  backend_test:
-    build: ./backend
-    container_name: ctf_backend_test
-    depends_on:
-      - db_test
-    environment:
-      NODE_ENV: test
-      DATABASE_URL: postgres://ctf_user:ctf_password@dB_test:5432/ctf_db_test
-      JWT_SECRET: test-secret
-      FLAG_PEPPER: test-pepper
-    command: sh -c "
-      echo 'Waiting for db_test...';
-      until nc -z db_test 5432; do
-      sleep 1;
-      done;
-      echo 'db_test is up, running migrations and tests...';
-      npm run migrate:test && npm test"
 
 volumes:
   pgdata:

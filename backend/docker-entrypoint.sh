@@ -9,7 +9,7 @@ done
 echo "PostgreSQL is up."
 
 echo "Running migrations..."
-NODE_ENV=production npm run migrate:prod
+npm run migrate:dev
 
 echo "Starting app..."
-NODE_ENV=production npm start
+npm start

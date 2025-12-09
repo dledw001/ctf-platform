@@ -8,8 +8,9 @@
     "start": "node src/server.js",
     "test": "cross-env NODE_ENV=test jest --runInBand",
     "migrate": "cross-env NODE_ENV=development node-pg-migrate up -f database.json --config-value dev",
-    "migrate:prod": "cross-env NODE_ENV=production node-pg-migrate up",
-    "migrate:test": "cross-env NODE_ENV=test node-pg-migrate up"
+    "migrate:dev": "cross-env NODE_ENV=development node-pg-migrate up",
+    "migrate:test": "cross-env NODE_ENV=test node-pg-migrate up",
+    "seed:demo": "node src/db/seed.js"
   },
   "keywords": [],
   "author": "",

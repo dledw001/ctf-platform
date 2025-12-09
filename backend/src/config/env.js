@@ -1,5 +1,5 @@
 // only use dotenv when .env is present && NODE_ENV is not production
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'production') {
     try {
         require('dotenv').config();
     } catch (err) {
