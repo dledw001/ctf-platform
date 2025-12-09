@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand"
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "migrate": "cross-env NODE_ENV=development node-pg-migrate up -f database.json --config-value dev",
+    "migrate:prod": "cross-env NODE_ENV=production node-pg-migrate up",
+    "migrate:test": "cross-env NODE_ENV=test node-pg-migrate up"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +22,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "node-pg-migrate": "^8.0.3",
     "pg": "^8.16.3"
   },
   "devDependencies": {

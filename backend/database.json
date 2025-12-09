@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "host":"localhost",
+    "port": 5432,
+    "database": "ctf_db",
+    "user": "ctf_user",
+    "password": "ctf_password"
+  },
+  "prod": {
+    "host":"db",
+    "port": 5432,
+    "database": "ctf_db",
+    "user": "ctf_user",
+    "password": "ctf_password"
+  }
+}
