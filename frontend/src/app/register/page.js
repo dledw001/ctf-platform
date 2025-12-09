@@ -24,7 +24,7 @@ export default function LoginPage() {
 
     return (
         <section>
-            <h1 className="text-xl font-bold mb-4">Login</h1>
+            <h1 className="text-xl font-bold mb-4">Register</h1>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-sm">
                 <input
                     type="email"
