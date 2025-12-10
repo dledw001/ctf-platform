@@ -61,17 +61,14 @@ export default function ChallengesPage() {
                                     </button>
                                 </div>
                             </div>
-                            <p className="text-muted mb-4">
-                                Lists all challenges.
-                            </p>
                             {!loading && !error && challenges.length === 0 && (
                                 <p className="text-muted mb-0">
-                                    No challenges are currently available.
+                                    No challenges yet.
                                 </p>
                             )}
                             {!loading && !error && challenges.length > 0 && (
                                 <div className="table-responsive">
-                                    <table className="table table-sm table-hover align-middle mb-0">
+                                    <table className="table table-sm align-middle mb-0">
                                         <thead className="table-dark">
                                         <tr>
                                             <th scope="col">Name</th>
@@ -87,11 +84,6 @@ export default function ChallengesPage() {
                                                     <div className="fw-semibold">
                                                         {challenge.title}
                                                     </div>
-                                                    {challenge.description && (
-                                                        <div className="text-muted small">
-                                                            {challenge.description}
-                                                        </div>
-                                                    )}
                                                 </td>
                                                 <td className="d-none d-md-table-cell">
                                                     {challenge.difficulty}

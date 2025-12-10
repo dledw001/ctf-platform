@@ -7,18 +7,23 @@ const router = express.Router();
 
 const COOKIE_NAME = 'token';
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true';
+
+function getCookieOptions() {
+    return {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: COOKIE_SECURE,
+        maxAge: COOKIE_MAX_AGE,
+    }
+}
 
 function setAuthCookie(res, payload) {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: '7 days',
     });
 
-    res.cookie(COOKIE_NAME, token, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: false, // set to true in prod (HTTPS)
-        maxAge: COOKIE_MAX_AGE
-    });
+    res.cookie(COOKIE_NAME, token, getCookieOptions());
 }
 
 function toPublicUser(row) {
@@ -111,11 +116,7 @@ router.post('/login', async (req, res, next) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-    res.clearCookie(COOKIE_NAME, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: false
-    });
+    res.clearCookie(COOKIE_NAME, getCookieOptions());
     res.json({success: true});
 });
 

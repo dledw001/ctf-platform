@@ -33,7 +33,7 @@ router.post('/', requireAuth, async (req, res, next) => {
 
        await client.query('BEGIN');
 
-       const challengeRes = await pool.query(
+       const challengeRes = await client.query(
          `SELECT id, flag_hash, title, points
          FROM challenges WHERE id = $1`,
          [id]
@@ -49,7 +49,7 @@ router.post('/', requireAuth, async (req, res, next) => {
        const submittedHash = hashFlag(cleanFlag);
        const isCorrect = submittedHash === challenge.flag_hash;
 
-       const insert = await pool.query(
+       const insert = await client.query(
            `INSERT INTO submissions (user_id, challenge_id, submitted_flag_hash, is_correct) 
             VALUES ($1, $2, $3, $4) 
             RETURNING id, user_id, challenge_id, is_correct, created_at`,
@@ -60,7 +60,8 @@ router.post('/', requireAuth, async (req, res, next) => {
            await client.query(
                 `UPDATE users 
                 SET score = score + $1, 
-                updated_at = NOW()WHERE id = $2`,
+                updated_at = NOW() 
+                WHERE id = $2`,
                 [challenge.points, userId]
            );
        }

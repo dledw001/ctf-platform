@@ -97,7 +97,7 @@ export default function AdminSubmissionsPage() {
                         <div className="card-body">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <h1 className="h4 mb-0">
-                                    <strong>Admin – Submissions</strong>
+                                    <strong>Admin Dashboard: Submissions</strong>
                                 </h1>
                                 <button
                                     type="button"
@@ -134,7 +134,7 @@ export default function AdminSubmissionsPage() {
 
                             {!loading && !error && submissions.length > 0 && (
                                 <div className="table-responsive">
-                                    <table className="table table-sm table-hover align-middle mb-0">
+                                    <table className="table table-sm align-middle mb-0">
                                         <thead className="table-dark">
                                         <tr>
                                             <th scope="col">Submission Timestamp</th>

@@ -1,27 +1,16 @@
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
     container_name: ctf_frontend
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+      NODE_ENV: production
     depends_on:
       - backend
-    command: >
-      sh -c "
-        echo 'Starting Next.js dev server...';
-        npm run dev &
-        DEV_PID=$!
-        echo 'Waiting for Next.js to start on :3000...';
-        # Poll until the dev server responds, then hit it once to warm up
-        until curl -sSf http://localhost:3000/ >/dev/null 2>&1; do
-          echo 'Still waiting for Next.js dev server...';
-          sleep 1;
-        done
-        echo 'Next.js dev server is up, warm-up request done.';
-        wait $$DEV_PID
-      "
 
   backend:
     build: ./backend
@@ -29,12 +18,12 @@ services:
     depends_on:
       - db
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
+      COOKIE_SECURE: "false"
+      ALLOW_SEED_DEMO: "true"
       DATABASE_URL: postgres://ctf_user:ctf_password@db:5432/ctf_db
       JWT_SECRET: secret
       FLAG_PEPPER: pepper
-      ADMIN_EMAIL: admin@example.com
-      ADMIN_PASSWORD: changeme
     ports:
       - "4000:4000"
 

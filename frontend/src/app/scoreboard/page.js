@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useAuth } from '../../../lib/auth';
+
 
 export default function ScoreboardPage() {
     const { user } = useAuth();
@@ -46,41 +46,26 @@ export default function ScoreboardPage() {
                     <div className="card shadow-sm">
                         <div className="card-body">
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h1 className="h4 mb-0">
-                                    <strong>Scoreboard</strong>
-                                </h1>
-                                <button
-                                    type="button"
-                                    className="btn btn-sm btn-outline-light"
-                                    onClick={loadScoreboard}
-                                    disabled={loading}
-                                >
-                                    Refresh
-                                </button>
+                                <h1 className="h4 mb-0"><strong>Scoreboard</strong></h1>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-light"
+                                        onClick={loadScoreboard}
+                                        disabled={loading}
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
                             </div>
-                            {loading && (
-                                <div className="d-flex justify-content-center py-4">
-                                    <div className="spinner-border text-secondary" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {!loading && error && (
-                                <div className="alert alert-danger" role="alert">
-                                    {error}
-                                </div>
-                            )}
-
                             {!loading && !error && rows.length === 0 && (
                                 <p className="text-muted mb-0">
                                     No scores yet.
                                 </p>
                             )}
-
                             {!loading && !error && rows.length > 0 && (
                                 <div className="table-responsive">
-                                    <table className="table table-sm table-hover align-middle mb-0">
+                                    <table className="table table-sm align-middle mb-0">
                                         <thead className="table-dark">
                                         <tr>
                                             <th scope="col">Rank</th>
@@ -93,11 +78,9 @@ export default function ScoreboardPage() {
                                         </thead>
                                         <tbody>
                                         {rows.map((row, index) => {
-                                            const isCurrentUser = user && user.id === row.id;
                                             return (
                                                 <tr
                                                     key={row.id}
-                                                    className={isCurrentUser ? 'table-primary' : ''}
                                                 >
                                                     <td>{index + 1}</td>
                                                     <td>{row.email}</td>

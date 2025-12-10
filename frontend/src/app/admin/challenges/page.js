@@ -21,9 +21,8 @@ export default function AdminChallengesPage() {
         points: 100,
     });
 
-    const apiBase = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
 
-    // Load challenges (public GET /challenges)
     async function loadChallenges() {
         setLoading(true);
         setError('');
@@ -188,7 +187,6 @@ export default function AdminChallengesPage() {
         );
     }
 
-    // Not admin – show message (backend still enforces via requireAdmin on POST/PUT/DELETE)
     if (!user || !user.isAdmin) {
         return (
             <div className="container py-5">
@@ -219,7 +217,7 @@ export default function AdminChallengesPage() {
                         <div className="card-body">
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <h1 className="h4 mb-0">
-                                    <strong>Admin – Challenges</strong>
+                                    <strong>Admin Dashboard: Challenges</strong>
                                 </h1>
                                 <div className="d-flex gap-2">
                                     <button
@@ -280,11 +278,6 @@ export default function AdminChallengesPage() {
                                                     <div className="fw-semibold">
                                                         {ch.title || 'Untitled'}
                                                     </div>
-                                                    {ch.description && (
-                                                        <div className="text-muted small">
-                                                            {ch.description}
-                                                        </div>
-                                                    )}
                                                 </td>
                                                 <td className="d-none d-md-table-cell">
                                                     {ch.difficulty ?? '-'}
@@ -293,7 +286,7 @@ export default function AdminChallengesPage() {
                                                     {ch.points ?? '-'}
                                                 </td>
                                                 <td>
-                                                    <div className="d-flex gap-2">
+                                                    <div className="d-flex gap-2 my-1">
                                                         <button
                                                             type="button"
                                                             className="btn btn-outline-light btn-sm"

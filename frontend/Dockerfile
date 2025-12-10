@@ -1,14 +1,19 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache curl
+WORKDIR /usr/src/app
 
-WORKDIR /ur/src/app
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 
+RUN npm run build
+
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+ENV NODE_ENV=production
+
+CMD ["npm", "run", "start"]

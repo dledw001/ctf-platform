@@ -12,4 +12,4 @@ echo "Running migrations..."
 npm run migrate:dev
 
 echo "Starting app..."
-npm run dev
+npm run start

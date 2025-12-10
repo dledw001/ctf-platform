@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
     "test": "cross-env NODE_ENV=test jest --runInBand",
     "migrate:dev": "cross-env NODE_ENV=development node-pg-migrate up",
     "migrate:test": "cross-env NODE_ENV=test node-pg-migrate up",
-    "seed:demo": "node src/db/seed.js"
+    "seed:demo": "node src/db/seed.js",
+    "create-admin": "node src/db/create-admin.js"
   },
   "keywords": [],
   "author": "",
