@@ -18,6 +18,11 @@ exports.up = pgm => {
             notNull: true,
             default: false,
         },
+        score: {
+            type: "integer",
+            notNull: true,
+            default: 0,
+        },
         created_at: {
             type: "timestamptz",
             notNull: true,
@@ -118,7 +123,11 @@ exports.up = pgm => {
 
     pgm.createIndex("submissions", "user_id", {name: "idx_submissions_user"});
     pgm.createIndex("submissions", "challenge_id", {name: "idx_submissions_challenge"});
-    pgm.createIndex("submissions", ["user_id", "challenge_id"], {name: "idx_submissions_user_challenge"});
+    pgm.createIndex("submissions", ["user_id", "challenge_id"], {
+        name: "unique_correct_submission",
+        unique: true,
+        where: "is_correct = TRUE"
+    });
 };
 
 exports.down = pgm => {

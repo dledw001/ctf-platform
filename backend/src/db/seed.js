@@ -5,6 +5,7 @@ const {hashFlag} = require('../utils/flag');
 async function seed() {
     console.log('Seeding database with demo data...');
 
+    /*
     const adminEmail = 'admin@example.com';
     const adminPassword = 'Password123';
     const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
@@ -17,6 +18,7 @@ async function seed() {
     );
     const adminId = adminRes.rows[0].id;
     console.log(`Admin user created: ${adminEmail} (id=${adminId})`);
+     */
 
     const challenges = [
         {

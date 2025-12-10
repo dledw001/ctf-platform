@@ -67,7 +67,7 @@ router.post('/register', async (req, res, next) => {
 
         setAuthCookie(res, {userId: user.id, isAdmin: user.is_admin });
 
-        res.status(201).json(toPublicUser(user));
+        res.status(201).json({ user: toPublicUser(user) });
 
     } catch (err) {
         next(err)
@@ -103,7 +103,7 @@ router.post('/login', async (req, res, next) => {
 
         setAuthCookie(res, { userId: user.id, isAdmin: user.is_admin });
 
-        res.status(200).json(toPublicUser(user));
+        res.status(200).json({ user: toPublicUser(user) });
     } catch(err) {
         next(err);
     }

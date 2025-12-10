@@ -7,7 +7,9 @@ const router = express.Router();
 
 // POST /api/submissions - users may CREATE submissions
 router.post('/', requireAuth, async (req, res, next) => {
-   try {
+    const client = await pool.connect();
+
+    try {
        const { challengeId, flag } = req.body;
 
        const id = Number(challengeId);
@@ -24,6 +26,13 @@ router.post('/', requireAuth, async (req, res, next) => {
            return res.status(400).json({error: 'Flag is required'});
        }
 
+       const userId = req.user.id;
+       if(!userId) {
+           return res.status(401).json({error: 'Unauthorized'});
+       }
+
+       await client.query('BEGIN');
+
        const challengeRes = await pool.query(
          `SELECT id, flag_hash, title, points
          FROM challenges WHERE id = $1`,
@@ -31,6 +40,7 @@ router.post('/', requireAuth, async (req, res, next) => {
        );
 
        if (challengeRes.rows.length === 0) {
+           await client.query('ROLLBACK');
            return res.status(404).json({error: 'Challenge not found'});
        }
 
@@ -39,17 +49,23 @@ router.post('/', requireAuth, async (req, res, next) => {
        const submittedHash = hashFlag(cleanFlag);
        const isCorrect = submittedHash === challenge.flag_hash;
 
-       const userId = req.user.id;
-       if ( !userId ) {
-           return res.status(401).json({error: 'Unauthorized'});
-       }
-
        const insert = await pool.query(
            `INSERT INTO submissions (user_id, challenge_id, submitted_flag_hash, is_correct) 
             VALUES ($1, $2, $3, $4) 
             RETURNING id, user_id, challenge_id, is_correct, created_at`,
            [userId, id, submittedHash, isCorrect]
        );
+
+       if (isCorrect) {
+           await client.query(
+                `UPDATE users 
+                SET score = score + $1, 
+                updated_at = NOW()WHERE id = $2`,
+                [challenge.points, userId]
+           );
+       }
+
+       await client.query('COMMIT');
 
        const submission = insert.rows[0];
 
@@ -63,7 +79,20 @@ router.post('/', requireAuth, async (req, res, next) => {
            },
        });
    }  catch (err) {
+       if (err.code === '23505') {
+           await client.query('ROLLBACK');
+           return res.status(409).json({
+               error: 'You have already solved this challenge',
+               correct: true,
+           });
+       }
+
+       try {
+           await client.query('ROLLBACK');
+       } catch (_) {}
         next(err);
+   } finally {
+       client.release();
    }
 });
 

@@ -1,52 +1,76 @@
-'use client'
+'use client';
 
 import {useState} from 'react';
 import {useRouter} from 'next/navigation';
-import { useAuth } from '../../../lib/auth';
+import {useAuth} from '../../../lib/auth';
+import Link from 'next/link';
 
 export default function LoginPage() {
-    const { login } = useAuth();
     const router = useRouter();
+    const {login} = useAuth();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
     async function handleSubmit(e) {
         e.preventDefault();
         setError('');
+        setSubmitting(true);
+
         try {
             await login(email, password);
             router.push('/challenges');
         } catch (err) {
-            setError(err.data?.error || 'Login failed');
+            setError(err?.message || 'Login failed');
+        } finally {
+            setSubmitting(false);
         }
     }
 
     return (
-        <section>
-            <h1 className="text-xl font-bold mb-4">Login</h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-sm">
-                <input
-                    type="email"
-                    placeholder="Email"
-                    className="border px-2 py-1"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    className="border px-2 py-1"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                {error && <p className="text-red-600 text-sm">{error}</p>}
-                <button type="submit" className="border px-3 py-1">
-                    Login
-                </button>
-            </form>
-        </section>
+        <div className="container py-5">
+            <div className="row justify-content-center">
+                <div className="col-md-6 col-lg-4">
+                    <div className="card shadow-sm">
+                        <div className="card-body">
+                            <h1 className="h4 mb-3 text-center">Login</h1>
+                            {error && (<div className="alert alert-danger py-2" role="alert">{error}</div>)}
+                            <form onSubmit={handleSubmit} noValidate>
+                                <div className="mb-3">
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        className="form-control"
+                                        placeholder="Email address"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        className="form-control"
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary w-100 mb-3"
+                                    disabled={submitting}>
+                                    Login
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

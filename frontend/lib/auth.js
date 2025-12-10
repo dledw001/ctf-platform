@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
 
         async function load() {
             try {
-                const data = await get('auth/me');
+                const data = await get('/auth/me');
                 if (!cancelled) {
                     setUser(data.user || null);
                 }
@@ -35,13 +35,13 @@ export function AuthProvider({ children }) {
 
     async function login(email, password) {
         const data = await post('/auth/login', { email, password });
-        setUser(data);
+        setUser(data.user || null);
         return data;
     }
 
     async function register(email, password) {
         const data = await post('/auth/register', { email, password });
-        setUser(data);
+        setUser(data.user || null);
         return data;
     }
 
