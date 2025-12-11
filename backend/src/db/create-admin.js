@@ -34,7 +34,7 @@ async function main() {
                 'UPDATE users SET is_admin = TRUE, updated_at = NOW() WHERE id = $1',
                 [user.id]
             );
-            console.log(`Promoted existing user ${email} (id=${user.id}) to admin and updated password.`);
+            console.log(`Promoted existing user ${email} (id=${user.id}) to admin.`);
         }
     } else {
         const insert = await pool.query(
