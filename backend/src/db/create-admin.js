@@ -31,8 +31,8 @@ async function main() {
             console.log(`User ${email} is already an admin (id=${user.id}).`);
         } else {
             await pool.query(
-                'UPDATE users SET is_admin = TRUE, password_hash = $1, updated_at = NOW() WHERE id = $2',
-                [passwordHash, user.id]
+                'UPDATE users SET is_admin = TRUE, updated_at = NOW() WHERE id = $1',
+                [user.id]
             );
             console.log(`Promoted existing user ${email} (id=${user.id}) to admin and updated password.`);
         }

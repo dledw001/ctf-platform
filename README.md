@@ -1,62 +1,60 @@
 # ctf-platform
-A mini CTF (Capture the Flag) platform with an admin side and a user side.
-
-## About
-- Dockerized application, runs via docker compose.
-- Frontend: React.js
-- Backend: Node.js with API endpoints
-- Database: PostgreSQL (node-pg-migrate handles migrations)
-- Cookies:
-  - Cookies are configured with httpOnly: true, with sameSite: lax. 
-  - Whether they are set to 'secure' or not is controlled by an environment variable, COOKIE_SECURE, in backend/src/routes/auth.js.
-  - COOKIE_SECURE: false - for local development / docker-compose on http://localhost
-  - COOKIE_SECURE: true - for HTTPS deployment
-- Access frontend UI via web browser: http://localhost:3000
-- API documentation: https://github.com/dledw001/ctf-platform/wiki/API-Documentation
-
+A mini CTF (Capture the Flag) platform with public challenges, authenticated submissions, and an admin dashboard.
+---
+## Architecture
+- Frontend: Next.js with React, Bootstrap 5 styling, client-side auth context
+- Backend: Node.js with Express, JWT auth in HttpOnly cookies
+- Database: PostgreSQL via Docker, schema managed with node-pg-migrate
+- Authentication: Email/password (bcrypt) and JWT stored in secure cookies
+- Features: User registration/login, browse challenges, flag submissions, scoreboard, admin dashboard with CRUD for challenges
+- Docker: `docker-compose.yml` orchestrates frontend, backend, database
+- Tests: Jest and Supertest for auth/challenges/submissions/scoreboard
+> Flags are salted with a pepper (FLAG_PEPPER env var) before hashing, ensuring flags are never stored in plaintext.
+---
 ## Requirements
 - Docker
-
-## Usage
-### Clone the repo:
+- Git
+---
+## Quick Start
+### 1. Clone and enter the repo:
 ```
 git clone https://github.com/dledw001/ctf-platform.git
-```
-### Navigate to ctf-platform directory:
-```
 cd ctf-platform
 ```
-### Start ctf-platorm:
+### 2. Launch stack:
 ```
 docker compose up --build frontend
 ```
-### Seeding the database with demo data (optional):
-From another terminal window, in the project root directory:
+### 3. (Optional) Load demo data:
+From another terminal window, in the project root:
 ```
 docker compose exec backend npm run seed:demo
 ```
-This command creates the following demo accounts (email / password):
-- admin@example.com / changeme
-- user1@example.com / changeme
-- user2@example.com / changeme
+- Creates users admin@example.com, user1@example.com, user2@example.com (password for all: changeme)
+- Inserts three sample challenges and a few submissions from each user.
+> Important: Demo seeing is guarded by ALLOW_SEED_DEMO env var. In `docker-compose.yml`, it is set to `true` for reviewer convenience. Set ALLOW_SEED_DEMO to `false` in production deployments.
 
-It also loads a small set of sample challenges and submissions so you can explore the platform without creating everything manually.
-#### NOTE ABOUT SEEDING:
-The seeding script is enabled by default in the Docker environment for reviewer convenience, but it is intended only for local development.
-Production deployments should disable demo seeding by setting `ALLOW_SEED_DEMO: "false"` in `docker-compose.yml`.
-When ALLOW_DEMO_SEED is not set to "true", the seed script will refuse to run and will not modify your database.
-### For production, admin users can be created as follows:
-From another terminal window, in the project root directory:
+### 4. Create your own admin user:
 ```
-docker compose exec backend npm run create-admin -- <email> <password>
+docker compose exec backend npm run create-admin -- you@email.com password
 ```
-This can also be used to promote existing users to admin users.
-### Load front end UI in a web browser:
-```
-http://localhost:3000
-```
-Users can view challenges, submit flags, and view the scoreboard.  
-Admin users can also create, edit, and delete challenges and view user submissions.
+- Promotes the user if they already exist, otherwise creates a new admin user.
+### 5. Open the app:
+Visit http://localhost:3000 in a browser.
+- Guests can browse challenges, view challenge details, view the scoreboard.
+- Authenticated users can submit flags; correct submissions add points to their score.
+- Admin users have access to a dropdown nav item and can create/edit/delete challenges and view all submissions.
+---
+## Environment Variables
+`docker-compose.yml` sets sane defaults for local testing. Override them via .env or otherwise.
+- DATABASE_URL: PostgreSQL connection string
+- JWT_SECRET: Secret used to sign JWTs
+- FLAG_PEPPER: Appended to flags before hashing
+- COOKIE_SECURE: Set to `true` in HTTPS/production deployments
+- ALLOW_SEED_DEMO: Must be `true` to allow demo seeding
+- PORT: Backend HTTP port (mapped to 4000 in Docker)
+> For any hosted deployment, set unique values for JWT_SECRET and FLAG_PEPPER, and run with COOKIE_SECURE=true so cookies are only sent over HTTPS.
+---
 ## Testing
 ### To run the backend test suite:
 ```
