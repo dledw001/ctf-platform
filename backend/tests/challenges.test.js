@@ -44,18 +44,20 @@ afterAll(async () => {
 
 describe('Public Challenge API', () => {
     test('GET /api/challenges returns empty list initially', async () => {
-        const res = await request(app).get('/api/challenges');
+        const res = await request(app)
+            .get('/api/challenges');
         expect(res.status).toBe(200);
         expect(res.body).toEqual([]);
     });
 
     test('GET /api/challenges/:id returns 404 for missing challenge', async () => {
-        const res = await request(app).get('/api/challenges/123');
+        const res = await request(app)
+            .get('/api/challenges/123');
         expect(res.status).toBe(404);
     });
 });
 
-describe('Admin Challenege API', () => {
+describe('Admin Challenge API', () => {
     test('non-authenticated POST /api/challenges returns 401', async () => {
         const res = await request(app)
             .post('/api/challenges')
@@ -168,5 +170,50 @@ describe('Admin Challenege API', () => {
 
         const get = await request(app).get(`/api/challenges/${id}`);
         expect(get.status).toBe(404);
+    });
+
+    test('recompute scores after challenge delete', async () => {
+        const created = await request(app)
+            .post('/api/challenges')
+            .set('Cookie', adminCookie)
+            .send({
+                title: 'Scored Challenge',
+                description: 'Counts towards scoreboard',
+                flag: 'FLAG{score}',
+                difficulty: 'easy',
+                points: 100,
+            });
+
+        expect(created.status).toBe(201);
+        const challengeId = created.body.id;
+
+        const submission = await request(app)
+            .post('/api/submissions')
+            .set('Cookie', userCookie)
+            .send({
+                challengeId,
+                flag: 'FLAG{score}',
+            });
+
+        expect(submission.status).toBe(201);
+        expect(submission.body.correct).toBe(true);
+
+        const scoreboardBefore = await request(app)
+            .get('/api/scoreboard');
+
+        expect(scoreboardBefore.status).toBe(200);
+        expect(scoreboardBefore.body[0].score).toBe(100);
+
+        const deleted = await request(app)
+            .delete(`/api/challenges/${challengeId}`)
+            .set('Cookie', adminCookie);
+
+        expect(deleted.status).toBe(204);
+
+        const scoreboardAfter = await request(app)
+            .get('/api/scoreboard');
+
+        expect(scoreboardAfter.status).toBe(200);
+        expect(scoreboardAfter.body[0].score).toBe(0);
     });
 });

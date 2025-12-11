@@ -43,7 +43,7 @@ This command creates the following demo accounts (email / password):
 It also loads a small set of sample challenges and submissions so you can explore the platform without creating everything manually.
 #### NOTE ABOUT SEEDING:
 The seeding script is enabled by default in the Docker environment for reviewer convenience, but it is intended only for local development.
-Production deployments should disable demo seeding by setting `ALLOW_DEMO_SEED: "false"` in `docker-compose.yml`.
+Production deployments should disable demo seeding by setting `ALLOW_SEED_DEMO: "false"` in `docker-compose.yml`.
 When ALLOW_DEMO_SEED is not set to "true", the seed script will refuse to run and will not modify your database.
 ### For production, admin users can be created as follows:
 From another terminal window, in the project root directory:

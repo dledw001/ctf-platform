@@ -18,6 +18,21 @@ function toPublicChallenge(row) {
     };
 }
 
+// helper to recompute scores after changes (e.g. deleted submissions)
+async function recomputeScores(client) {
+    await client.query(
+        `UPDATE users u
+        SET score = COALESCE((
+        SELECT SUM(c.points)
+        FROM submissions s
+        JOIN challenges c ON c.id = s.challenge_id
+        WHERE s.user_id = u.id
+        AND s.is_correct = TRUE
+        ), 0),
+        updated_at = NOW()`
+    );
+}
+
 // GET /api/challenges - READ public list (no flag)
 router.get('/', async (req, res, next) => {
     try {
@@ -165,24 +180,40 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res, next) => {
 
 // DELETE /api/challenges/:id DELETE (admin only)
 router.delete('/:id', requireAuth, requireAdmin, async (req, res, next) => {
+    const client = await pool.connect();
+
     try {
         const id = Number(req.params.id);
         if (!Number.isInteger(id) || id <= 0) {
-            return res.status(400).json({error: 'Invalid challenge id'});
+            client.release();
+            return res.status(400).json({ error: 'Invalid challenge id' });
         }
 
-        const result = await pool.query(
+        await client.query('BEGIN');
+
+        const result = await client.query(
             'DELETE FROM challenges WHERE id = $1 RETURNING id',
             [id]
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({error: 'Challenge not found'});
+            await client.query('ROLLBACK');
+            client.release();
+            return res.status(404).json({ error: 'Challenge not found' });
         }
+
+        await recomputeScores(client);
+
+        await client.query('COMMIT');
 
         res.status(204).send();
     } catch (err) {
+        try {
+            await client.query('ROLLBACK');
+        } catch (_) {}
         next(err);
+    } finally {
+        client.release();
     }
 });
 
